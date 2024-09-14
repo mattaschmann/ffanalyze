@@ -2,6 +2,9 @@ import re
 
 import pandas as pd
 from pandas.io.formats.style import StylerRenderer
+
+from ffanalyze import format
+
 pd.options.mode.chained_assignment = None  # default='warn'
 
 def sheet(file_path: str) -> pd.DataFrame:
@@ -35,21 +38,13 @@ def style_sheet(file_path: str) -> StylerRenderer:
 
     result = sheet(file_path)
 
-    def highlight_owner(val: str):
-        match val:
-            case 'Injured Reserves':
-                return 'background-color: #b7e1cd; color: black'
-            case 'FA':
-                return 'background-color: #c9daf8; color: black'
-            case _:
-                if re.match(r'^W\ .*', val):
-                    return 'background-color: #ffd966; color: black'
-
-                return ''
-
     styled = result.sort_values(by='Zval', ascending=False)\
         .style\
-        .map(highlight_owner, subset='Owner')\
+        .map(format.highlight_owner, subset='Owner')\
+        .apply(lambda col: format.color_column(col, '#fce5cd'), subset='Yds')\
+        .apply(lambda col: format.color_column(col, '#d9ead3'), subset='Pts/Yd')\
+        .apply(lambda col: format.color_column(col, '#d9d2e9'), subset='Yds/G')\
+        .apply(lambda col: format.color_column(col, '#d0e0e3'), subset='Pts/G')\
         .format(precision=2, subset=['Pts', 'Pts/Yd', 'P/Y Z', 'Pts/G', 'Y/G Z', 'P/G Z', 'Zval'])\
         .format(precision=0, subset=['Yds/G'])
 
