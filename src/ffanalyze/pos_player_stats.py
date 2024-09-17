@@ -58,7 +58,11 @@ def sheet(position: Position) -> pd.DataFrame:
     result[col_names.pt_opp_z_col] = math_utils.z_score(result[col_names.pt_opp_col])   # Points per opp z-score
     result[col_names.ops_g_z_col] = math_utils.z_score(result[col_names.ops_g_col])    # Ops per game z-score
     result['P/G Z'] = math_utils.z_score(result['Pts/G'])    # Points per game z-score
-    result['Zval'] = (result[col_names.ops_g_z_col] + result['P/G Z']) / 2 # Z value score
+    result['Zval'] = (
+            (result[col_names.pt_opp_z_col] / 2) + \
+            (result[col_names.ops_g_z_col] / 2) + \
+            result['P/G Z']
+        ) / 3 # Z value score
 
     # get defense
     # @Matt TODO: add points against stuff
