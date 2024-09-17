@@ -17,6 +17,10 @@ requires-python = "==3.12.*"
 readme = "README.md"
 license = {text = "MIT"}
 
-
 [tool.pdm]
 distribution = false
+
+[tool.pdm.scripts]
+teams = 'python ./src/ffanalyze/teams.py'
+defense = 'python ./src/ffanalyze/defense.py'
+qbs = 'python ./src/ffanalyze/qb_stats.py'

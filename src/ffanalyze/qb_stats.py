@@ -1,15 +1,16 @@
 import pandas as pd
 from pandas.io.formats.style import StylerRenderer
+import os
 
-from . import colors
-
-from ffanalyze import format
+from ffanalyze import defense, math_utils, format
 
 pd.options.mode.chained_assignment = None  # default='warn'
 
-def sheet(file_path: str) -> pd.DataFrame:
+dirname = os.path.dirname(__file__)
+
+def sheet() -> pd.DataFrame:
     number_cols = ['GP', 'Pts', 'PaY', 'PaTd', 'Int', 'RuAt', 'RuY', 'RuTd', 'Tar', 'Rec', 'RecY', 'RecTd', 'RetY', 'RetTd', 'TwPt', 'Fum']
-    df = pd.read_json(file_path)
+    df = pd.read_json(os.path.join(dirname, '../../data/QBs.json'))
     qbs = df.copy()
 
     # cleanup
@@ -24,38 +25,28 @@ def sheet(file_path: str) -> pd.DataFrame:
     result['Pts/Yd'] = qbs['Pts'] / result['Yds']            # Points per yard
     result['Yds/G'] = result['Yds'] / qbs['GP']              # Yards per game
     result['Pts/G'] = qbs['Pts'] / qbs['GP']                 # Points per game
-    result['P/Y Z'] = z_score(result['Pts/Yd'])              # Points per yard z-score
-    result['Y/G Z'] = z_score(result['Yds/G'])               # Yards per game z-score
-    result['P/G Z'] = z_score(result['Pts/G'])               # Points per game z-score
+    result['P/Y Z'] = math_utils.z_score(result['Pts/Yd'])   # Points per yard z-score
+    result['Y/G Z'] = math_utils.z_score(result['Yds/G'])    # Yards per game z-score
+    result['P/G Z'] = math_utils.z_score(result['Pts/G'])    # Points per game z-score
     result['Zval'] = (result['Y/G Z'] + result['P/G Z']) / 2 # Z value score
+
+    # get defense
+    pts_ag = defense.sheet(os.path.join(dirname, '../../data/QBPtsAg.json'))
+    df = pd.read_json(os.path.join(dirname, '../../data/QBs.json'))
 
     return result
 
 def style_sheet(sheet: pd.DataFrame) -> StylerRenderer:
-    pd.set_option('display.max_rows', 500)
-    pd.set_option('display.max_columns', 500)
-    pd.set_option('display.width', 1000)
+    return format.style_sheet(sheet, opp_col='Yds',
+                              pt_opp_col='Pts/Yd',
+                              opp_g_col='Yds/G',
+                              pt_opp_z_col='P/Y Z',
+                              opp_g_z_col='Y/G Z',
+                              )
 
-    styled = sheet.style\
-        .map(format.highlight_owner, subset='Owner')\
-        .apply(lambda col: format.color_column(col, '#fce5cd'), subset='Yds')\
-        .apply(lambda col: format.color_column(col, '#d9ead3'), subset='Pts/Yd')\
-        .apply(lambda col: format.color_column(col, '#d9d2e9'), subset='Yds/G')\
-        .apply(lambda col: format.color_column(col, '#d0e0e3'), subset='Pts/G')\
-        .background_gradient(cmap=colors.rwg_cm, subset='P/Y Z')\
-        .background_gradient(cmap=colors.dark_rwg_cm, subset='Y/G Z')\
-        .background_gradient(cmap=colors.cwy_cm, subset='P/G Z')\
-        .background_gradient(cmap=colors.bwo_cm, subset='Zval')\
-        .format(precision=2, subset=['Pts', 'Pts/Yd', 'P/Y Z', 'Pts/G', 'Y/G Z', 'P/G Z', 'Zval'])\
-        .format(precision=0, subset=['Yds/G'])
-
-    return styled
-
-def z_score(s) -> float:
-    return (s - s.mean()) / s.std()
-
-# if __name__ == '__main__':
-#     style = style_sheet('data/QBs.json')
+if __name__ == '__main__':
+    print(sheet())
+    # style = style_sheet('data/QBs.json')
     # style.data.to_excel('out/qbs.xlsx')
     # print(df.style.to_html())
     # print(df)
