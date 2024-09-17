@@ -1,4 +1,5 @@
 from enum import Enum
+from operator import pos
 import pandas as pd
 from pandas.io.formats.style import StylerRenderer
 import os
@@ -16,11 +17,16 @@ class Position(Enum):
     WR = 'WR'
     RB = 'RB'
     TE = 'TE'
+    K = 'K'
 
 RET_YDS_PT = 50 # return yards per point
 
 def sheet(position: Position) -> pd.DataFrame:
-    number_cols = ['GP', 'Pts', 'PaY', 'PaTd', 'Int', 'RuAt', 'RuY', 'RuTd', 'Tar', 'Rec', 'RecY', 'RecTd', 'RetY', 'RetTd', 'TwPt', 'Fum']
+    if position == Position.K:
+        number_cols = ['GP', 'Pts', '0-19', '20-29', '30-39', '40-49', '50+', 'Pat']
+    else:
+        number_cols = ['GP', 'Pts', 'PaY', 'PaTd', 'Int', 'RuAt', 'RuY', 'RuTd', 'Tar', 'Rec', 'RecY', 'RecTd', 'RetY', 'RetTd', 'TwPt', 'Fum']
+
     df = pd.read_json(os.path.join(dirname, f'../../data/{position.value}s.json'))
     pos_df = df.copy()
 
@@ -35,10 +41,15 @@ def sheet(position: Position) -> pd.DataFrame:
     match position:        # total opp
         case Position.QB:
             col_names = ColNames('Y')
-            result[col_names.opp_col] = pos_df[['PaY', 'RuY']].sum(axis = 1)
+            result[col_names.opp_col] = pos_df[['PaY', 'RuY']].sum(axis=1)
         case Position.WR|Position.RB|Position.TE:
             col_names = ColNames('O')
-            result[col_names.opp_col] = pos_df[['RuAt', 'Tar']].sum(axis = 1) + (pos_df['RetY'] / RET_YDS_PT)
+            result[col_names.opp_col] = pos_df[['RuAt', 'Tar']].sum(axis=1) + (pos_df['RetY'] / RET_YDS_PT)
+        case Position.K:
+            col_names = ColNames('O')
+            result[col_names.opp_col] = \
+                pos_df[['Pat','0-19','20-29','30-39','40-49','50+']].sum(axis=1)
+
 
 
     result[col_names.pt_opp_col] = pos_df['Pts'] / result[col_names.opp_col]            # Points per opp
@@ -59,7 +70,7 @@ def style_sheet(sheet: pd.DataFrame, position: Position) -> StylerRenderer:
     match position:
         case Position.QB:
             opp_abbr = 'Y'
-        case Position.WR|Position.RB|Position.TE:
+        case _:
             opp_abbr = 'O'
 
     return format.style_sheet(sheet, ColNames(opp_abbr))
