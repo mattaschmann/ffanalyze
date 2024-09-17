@@ -39,8 +39,6 @@ def sheet(position: Position) -> pd.DataFrame:
         case Position.WR|Position.RB|Position.TE:
             col_names = ColNames('O')
             result[col_names.opp_col] = pos_df[['RuAt', 'Tar']].sum(axis = 1) + (pos_df['RetY'] / RET_YDS_PT)
-        case _:
-            raise Exception(f'Postion "{position.value}" not found')
 
 
     result[col_names.pt_opp_col] = pos_df['Pts'] / result[col_names.opp_col]            # Points per opp
@@ -63,8 +61,6 @@ def style_sheet(sheet: pd.DataFrame, position: Position) -> StylerRenderer:
             opp_abbr = 'Y'
         case Position.WR|Position.RB|Position.TE:
             opp_abbr = 'O'
-        case _:
-            raise Exception('Unknown position: ' + position.value)
 
     return format.style_sheet(sheet, ColNames(opp_abbr))
 
