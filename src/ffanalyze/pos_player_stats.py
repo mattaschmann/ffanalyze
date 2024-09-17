@@ -36,7 +36,7 @@ def sheet(position: Position) -> pd.DataFrame:
         case Position.QB:
             col_names = ColNames('Y')
             result[col_names.opp_col] = pos_df[['PaY', 'RuY']].sum(axis = 1)
-        case Position.WR:
+        case Position.WR|Position.RB|Position.TE:
             col_names = ColNames('O')
             result[col_names.opp_col] = pos_df[['RuAt', 'Tar']].sum(axis = 1) + (pos_df['RetY'] / RET_YDS_PT)
         case _:
@@ -53,7 +53,7 @@ def sheet(position: Position) -> pd.DataFrame:
 
     # get defense
     # @Matt TODO: add points against stuff
-    pts_ag = defense.sheet(os.path.join(dirname, f'../../data/{position.value}PtsAg.json'))
+    # pts_ag = defense.sheet(os.path.join(dirname, f'../../data/{position.value}PtsAg.json'))
 
     return result
 

@@ -21,11 +21,15 @@ def highlight_owner(val: str):
 def highlight_status(status: str):
     match status:
         case 'Q':
-            return 'background-color: #d0e0e3; color: black'
+            return 'background-color: #0011a8; color: black'
         case 'O':
-            return 'background-color: #fce5cd; color: black'
+            return 'background-color: #7b0090; color: black'
+        case 'D':
+            return 'background-color: #bd006a; color: black'
         case 'IR':
-            return 'background-color: #990000; color: black'
+            return 'background-color: #f40034; color: black'
+        case 'NA':
+            return 'background-color: #ffff00; color: black'
         case _:
             return ''
 
