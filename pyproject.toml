@@ -24,3 +24,4 @@ distribution = false
 teams = 'python ./src/ffanalyze/teams.py'
 defense = 'python ./src/ffanalyze/defense.py'
 qbs = 'python ./src/ffanalyze/qb_stats.py'
+pos = 'python ./src/ffanalyze/pos_player_stats.py'
