@@ -57,14 +57,16 @@ def sheet(position: Position) -> pd.DataFrame:
 
     return result
 
-def style_sheet(sheet: pd.DataFrame, opp_abbr: str) -> StylerRenderer:
+def style_sheet(sheet: pd.DataFrame, position: Position) -> StylerRenderer:
+    match position:
+        case Position.QB:
+            opp_abbr = 'Y'
+        case Position.WR|Position.RB|Position.TE:
+            opp_abbr = 'O'
+        case _:
+            raise Exception('Unknown position: ' + position.value)
+
     return format.style_sheet(sheet, ColNames(opp_abbr))
 
-def qb_sheet():
-    return sheet(Position.QB)
-
-def wr_sheet():
-    return sheet(Position.WR)
-
-if __name__ == '__main__':
-    print(qb_sheet())
+# if __name__ == '__main__':
+    # print(qb_sheet())
