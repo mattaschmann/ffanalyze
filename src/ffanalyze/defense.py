@@ -9,7 +9,6 @@ def sheet(file_path: str) -> pd.DataFrame:
     joined = df.set_index('Team').join(abbr.set_index('Team'))
     result = joined.copy()
 
-    result['D P/G Z'] = math_utils.z_score(joined['PtsAg'])
     result['D PCo'] = math_utils.coef(joined['PtsAg'])
 
     return result

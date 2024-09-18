@@ -52,12 +52,12 @@ def style_sheet(sheet: pd.DataFrame, col_names: ColNames, position: Position) ->
         .apply(lambda col: color_column(col, '#d9ead3'), subset=col_names.pt_opp_col)\
         .apply(lambda col: color_column(col, '#d9d2e9'), subset=col_names.ops_g_col)\
         .apply(lambda col: color_column(col, '#d0e0e3'), subset='Pts/G')\
-        .background_gradient(cmap=colors.rwg_cm, subset=col_names.pt_opp_z_col)\
+        .background_gradient(cmap=colors.rwg_cm, subset=[col_names.pt_opp_z_col, 'D PCo'])\
         .background_gradient(cmap=colors.dark_rwg_cm, subset=col_names.ops_g_z_col)\
-        .background_gradient(cmap=colors.cwy_cm, subset='P/G Z')\
-        .background_gradient(cmap=colors.bwo_cm, subset='Zval')\
+        .background_gradient(cmap=colors.cwy_cm, subset=['P/G Z'])\
+        .background_gradient(cmap=colors.bwo_cm, subset=['Zval', 'EP'])\
         .set_properties(**{'text-align': 'left'}, subset=['PlayerName', 'Opp', 'Owner'])\
-        .set_table_styles([{ 'selector': 'th', 'props': [('text-align', 'left')] }])
+        .set_table_styles([{ 'selector': 'th', 'props': [('text-align', 'left')] }])\
 
     if position != Position.DEF:
         styled = styled\
@@ -66,6 +66,18 @@ def style_sheet(sheet: pd.DataFrame, col_names: ColNames, position: Position) ->
             .set_properties(**{'text-align': 'center', 'font-weight': 'bold'}, subset=['Sts'])
 
 
-    result = styled.format(precision=2, subset=[col_names.ops_g_col, 'Pts', col_names.pt_opp_col, col_names.pt_opp_z_col, 'Pts/G', col_names.ops_g_z_col, 'P/G Z', 'Zval'])
+    result = styled.format( precision=2, subset=[
+        col_names.ops_g_col,
+        'Pts',
+        col_names.pt_opp_col,
+        col_names.pt_opp_z_col,
+        'Pts/G',
+        col_names.ops_g_z_col,
+        'P/G Z',
+        'Zval',
+        'PtsAg',
+        'D PCo',
+        'EP',
+    ])
 
     return result

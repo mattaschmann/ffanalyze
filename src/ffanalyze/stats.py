@@ -3,7 +3,7 @@ import os
 import pandas as pd
 from pandas.io.formats.style import StylerRenderer
 
-from ffanalyze import format, math_utils
+from ffanalyze import format, math_utils, defense
 from ffanalyze.col_names import ColNames
 from ffanalyze.position import Position
 
@@ -63,9 +63,19 @@ def sheet(position: Position) -> pd.DataFrame:
             result['P/G Z']
         ) / 2 # Z value score
 
+    # move opponent to end
+    opponent = result.pop('Opp')
+    result['Opp'] = opponent
+
     # get defense
-    # @Matt TODO: add points against stuff
-    # pts_ag = defense.sheet(os.path.join(dirname, f'../../data/{position.value}PtsAg.json'))
+    pts_ag = defense.sheet(os.path.join(dirname, f'../../data/{position.value}PtsAg.json'))
+    result = result.merge(pts_ag, left_on='Opp', right_on='Abbr')
+
+    # expected points
+    result['EP'] = result['Pts/G'] * result['D PCo']
+
+    # remove unneeded columns
+    result = result.drop(['Abbr'], axis=1)
 
     return result
 
