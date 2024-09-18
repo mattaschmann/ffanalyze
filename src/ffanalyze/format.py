@@ -6,6 +6,7 @@ from pandas.io.formats.style import StylerRenderer
 
 from ffanalyze import colors
 from ffanalyze.col_names import ColNames
+from ffanalyze.position import Position
 
 def highlight_owner(val: str):
     match val:
@@ -39,14 +40,14 @@ def color_column(col: Series, color: str):
     return [f'background-color: {color}; color: black'] * len(col)
 
 
-def style_sheet(sheet: pd.DataFrame, col_names: ColNames) -> StylerRenderer:
+def style_sheet(sheet: pd.DataFrame, col_names: ColNames, position: Position) -> StylerRenderer:
     pd.set_option('display.max_rows', 500)
     pd.set_option('display.max_columns', 500)
     pd.set_option('display.width', 1000)
 
+
     styled = sheet.style\
         .map(highlight_owner, subset='Owner')\
-        .map(highlight_status, subset='Sts')\
         .apply(lambda col: color_column(col, '#fce5cd'), subset=col_names.opp_col)\
         .apply(lambda col: color_column(col, '#d9ead3'), subset=col_names.pt_opp_col)\
         .apply(lambda col: color_column(col, '#d9d2e9'), subset=col_names.ops_g_col)\
@@ -56,6 +57,10 @@ def style_sheet(sheet: pd.DataFrame, col_names: ColNames) -> StylerRenderer:
         .background_gradient(cmap=colors.dark_rwg_cm, subset=col_names.ops_g_z_col)\
         .background_gradient(cmap=colors.cwy_cm, subset='P/G Z')\
         .background_gradient(cmap=colors.bwo_cm, subset='Zval')\
-        .format(precision=2, subset=[col_names.ops_g_col, 'Pts', col_names.pt_opp_col, col_names.pt_opp_z_col, 'Pts/G', col_names.ops_g_z_col, 'P/G Z', 'Zval'])
 
-    return styled
+    if position != Position.DEF:
+        styled = styled.map(highlight_status, subset='Sts')
+
+    result = styled.format(precision=2, subset=[col_names.ops_g_col, 'Pts', col_names.pt_opp_col, col_names.pt_opp_z_col, 'Pts/G', col_names.ops_g_z_col, 'P/G Z', 'Zval'])
+
+    return result

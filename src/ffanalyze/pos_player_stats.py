@@ -1,31 +1,26 @@
-from enum import Enum
-from operator import pos
+import os
+
 import pandas as pd
 from pandas.io.formats.style import StylerRenderer
-import os
-from typing import List, cast
 
-from ffanalyze import defense, math_utils, format
+from ffanalyze import format, math_utils
 from ffanalyze.col_names import ColNames
+from ffanalyze.position import Position
 
 pd.options.mode.chained_assignment = None  # default='warn'
 
 dirname = os.path.dirname(__file__)
 
-class Position(Enum):
-    QB = 'QB'
-    WR = 'WR'
-    RB = 'RB'
-    TE = 'TE'
-    K = 'K'
-
 RET_YDS_PT = 50 # return yards per point
 
 def sheet(position: Position) -> pd.DataFrame:
-    if position == Position.K:
-        number_cols = ['GP', 'Pts', '0-19', '20-29', '30-39', '40-49', '50+', 'Pat']
-    else:
-        number_cols = ['GP', 'Pts', 'PaY', 'PaTd', 'Int', 'RuAt', 'RuY', 'RuTd', 'Tar', 'Rec', 'RecY', 'RecTd', 'RetY', 'RetTd', 'TwPt', 'Fum']
+    match position:
+        case Position.K:
+            number_cols = ['GP', 'Pts', '0-19', '20-29', '30-39', '40-49', '50+', 'Pat']
+        case Position.DEF:
+            number_cols = ['GP', 'Pts', 'PtsVs', 'Sack', 'Safe', 'Int', 'FumR', 'TDs', 'BlkK', 'RetTD']
+        case _:
+            number_cols = ['GP', 'Pts', 'PaY', 'PaTd', 'Int', 'RuAt', 'RuY', 'RuTd', 'Tar', 'Rec', 'RecY', 'RecTd', 'RetY', 'RetTd', 'TwPt', 'Fum']
 
     df = pd.read_json(os.path.join(dirname, f'../../data/{position.value}s.json'))
     pos_df = df.copy()
@@ -49,6 +44,10 @@ def sheet(position: Position) -> pd.DataFrame:
             col_names = ColNames('O')
             result[col_names.opp_col] = \
                 pos_df[['Pat','0-19','20-29','30-39','40-49','50+']].sum(axis=1)
+        case Position.DEF:
+            col_names = ColNames('O')
+            result[col_names.opp_col] = \
+                pos_df[['Sack', 'Safe', 'Int', 'FumR', 'TDs', 'BlkK', 'RetTD']].sum(axis=1)
 
 
 
@@ -62,7 +61,7 @@ def sheet(position: Position) -> pd.DataFrame:
             (result[col_names.pt_opp_z_col] / 2) + \
             (result[col_names.ops_g_z_col] / 2) + \
             result['P/G Z']
-        ) / 3 # Z value score
+        ) / 2 # Z value score
 
     # get defense
     # @Matt TODO: add points against stuff
@@ -77,7 +76,7 @@ def style_sheet(sheet: pd.DataFrame, position: Position) -> StylerRenderer:
         case _:
             opp_abbr = 'O'
 
-    return format.style_sheet(sheet, ColNames(opp_abbr))
+    return format.style_sheet(sheet, ColNames(opp_abbr), position)
 
 # if __name__ == '__main__':
     # print(qb_sheet())
