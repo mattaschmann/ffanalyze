@@ -28,7 +28,7 @@ def sheet() -> pd.DataFrame:
                 "Zval",
                 "Opp",
                 "D PCo",
-                "EP",
+                "EZ",
             ]
         ]
 
@@ -55,7 +55,7 @@ def style_sheet(sheet: pd.DataFrame) -> StylerRenderer:
         .map(highlight_status, subset="Sts")
         .apply(lambda col: color_column(col, "#d0e0e3"), subset="Pts/G")
         .background_gradient(cmap=colors.rwg_cm, subset=["D PCo"])
-        .background_gradient(cmap=colors.bwo_cm, subset=["Zval", "EP"])
+        .background_gradient(cmap=colors.bwo_cm, subset=["Zval", "EZ"])
         .background_gradient(cmap=colors.cwy_cm, subset=["P/G Z"])
         .background_gradient(cmap=colors.dark_rwg_cm, subset="GP")
         .set_properties(**{"text-align": "left"}, subset=["PlayerName", "Opp", "Owner"])
@@ -69,7 +69,7 @@ def style_sheet(sheet: pd.DataFrame) -> StylerRenderer:
             "P/G Z",
             "Zval",
             "D PCo",
-            "EP",
+            "EZ",
         ],
     )
 

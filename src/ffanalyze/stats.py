@@ -92,9 +92,8 @@ def sheet(position: Position) -> pd.DataFrame:
         result[col_names.ops_g_col]
     )  # Ops per game z-score
     result["P/G Z"] = math_utils.z_score(result["Pts/G"])  # Points per game z-score
-    result["Zval"] = (
-        result[col_names.pt_opp_z_col] + result[col_names.ops_g_z_col] + result["P/G Z"]
-    ) / 3  # Z value score
+    # I've removed pts per opp z, as it skewed the results
+    result["Zval"] = (result[col_names.ops_g_z_col] + result["P/G Z"]) / 2  # Z value score
 
     # move opponent to end
     opponent = result.pop("Opp")
@@ -104,8 +103,8 @@ def sheet(position: Position) -> pd.DataFrame:
     pts_ag = defense.sheet(os.path.join(dirname, f"../../data/{position.value}PtsAg.json"))
     result = result.merge(pts_ag, left_on="Opp", right_on="Abbr")
 
-    # expected points
-    result["EP"] = result["Pts/G"] * result["D PCo"]
+    # expected Z
+    result["EZ"] = result["Zval"] * result["D PCo"]
 
     # remove unneeded columns
     result = result.drop(["Abbr"], axis=1)

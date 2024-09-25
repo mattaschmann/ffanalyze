@@ -55,7 +55,7 @@ def style_sheet(sheet: pd.DataFrame, col_names: ColNames, position: Position) ->
         .background_gradient(cmap=colors.rwg_cm, subset=[col_names.pt_opp_z_col, 'D PCo'])\
         .background_gradient(cmap=colors.dark_rwg_cm, subset=col_names.ops_g_z_col)\
         .background_gradient(cmap=colors.cwy_cm, subset=['P/G Z'])\
-        .background_gradient(cmap=colors.bwo_cm, subset=['Zval', 'EP'])\
+        .background_gradient(cmap=colors.bwo_cm, subset=['Zval', 'EZ'])\
         .set_properties(**{'text-align': 'left'}, subset=['PlayerName', 'Opp', 'Owner'])\
         .set_table_styles([{ 'selector': 'th', 'props': [('text-align', 'left')] }])\
 
@@ -77,7 +77,7 @@ def style_sheet(sheet: pd.DataFrame, col_names: ColNames, position: Position) ->
         'Zval',
         'PtsAg',
         'D PCo',
-        'EP',
+        'EZ',
     ])
 
     return result
