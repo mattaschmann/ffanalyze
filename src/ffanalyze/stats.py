@@ -82,6 +82,9 @@ def sheet(position: Position) -> pd.DataFrame:
                 ["Sack", "Safe", "Int", "FumR", "TDs", "BlkK", "RetTD"]
             ].sum(axis=1)
 
+    # needs to have positive opps
+    result = result.query(f"{col_names.opp_col} > 0")
+
     result[col_names.pt_opp_col] = pos_df["Pts"] / result[col_names.opp_col]  # Points per opp
     result[col_names.ops_g_col] = result[col_names.opp_col] / pos_df["GP"]  # Ops per game
     result["Pts/G"] = pos_df["Pts"] / pos_df["GP"]  # Points per game
