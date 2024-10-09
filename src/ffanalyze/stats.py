@@ -106,6 +106,9 @@ def sheet(position: Position) -> pd.DataFrame:
     pts_ag = defense.sheet(os.path.join(dirname, f"../../data/{position.value}PtsAg.json"))
     result = result.merge(pts_ag, left_on="Opp", right_on="Abbr")
 
+    # set bye status
+    result.loc[result["Opp"] == "Bye", "Sts"] = "Bye"
+
     # expected Z
     result["EZ"] = result["Zval"] * result["D PCo"]
 
