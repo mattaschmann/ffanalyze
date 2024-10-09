@@ -52,7 +52,7 @@ def sheet(position: Position) -> pd.DataFrame:
             ]
 
     df = pd.read_json(os.path.join(dirname, f"../../data/{position.value}s.json"))
-    pos_df = df.copy()
+    pos_df = df.drop_duplicates(subset="PlayerId")
 
     # cleanup
     for col in number_cols:
