@@ -85,4 +85,27 @@ def style_sheet(sheet: pd.DataFrame, col_names: ColNames, position: Position) ->
         ],
     )
 
+    if position != Position.DEF and position != Position.K:
+        result = result.format(
+            precision=0,
+            subset=[
+                col_names.opp_col,
+                "PaY",
+                "GP",
+                "PaTd",
+                "Int",
+                "RuAt",
+                "RuY",
+                "RuTd",
+                "Tar",
+                "Rec",
+                "RecY",
+                "RecTd",
+                "RetY",
+                "RetTd",
+                "TwPt",
+                "Fum",
+            ],
+        )
+
     return result

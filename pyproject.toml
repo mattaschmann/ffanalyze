@@ -25,10 +25,9 @@ qbs = 'python ./src/ffanalyze/qb_stats.py'
 pos = 'python ./src/ffanalyze/pos_player_stats.py'
 
 [tool.pdm.dev-dependencies]
-dev = ["isort>=5.13.2", "black>=24.8.0"]
+dev = [
+    "ruff>=0.6.9",
+]
 
-[tool.isort]
-profile = 'black'
-
-[tool.black]
-line-length = 100
+[tool.ruff]
+line-length = 120

@@ -59,7 +59,9 @@ def style_sheet(sheet: pd.DataFrame) -> StylerRenderer:
         .background_gradient(cmap=colors.cwy_cm, subset=["P/G Z"])
         .background_gradient(cmap=colors.dark_rwg_cm, subset="GP")
         .set_properties(**{"text-align": "left"}, subset=["PlayerName", "Opp", "Owner"])
-        .set_properties(**{"text-align": "center", "font-weight": "bold"}, subset=["Sts"])
+        .set_properties(
+            **{"text-align": "center", "font-weight": "bold"}, subset=["Sts"]
+        )
         .set_table_styles([{"selector": "th", "props": [("text-align", "left")]}])
     )
     result = styled.format(
